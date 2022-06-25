@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import axios from "axios";
 const UserItem = ({ user }) => {
+  const [sent, setSent] = useState(false);
   const [error, setError] = useState(false);
   const sendVerification = async () => {
     try {
@@ -10,6 +11,7 @@ const UserItem = ({ user }) => {
       const config = { headers: { "Content-Type": "application/json" } };
       const { data } = await axios.post("api/v1/user/verify", reqData, config);
       console.log(data);
+      setSent(true);
     } catch (e) {
       setError(true);
       console.log(e);
@@ -23,7 +25,11 @@ const UserItem = ({ user }) => {
           <button className="btn btn-primary" onClick={sendVerification}>
             Verify
           </button>
-          <div>{error && "can't send email there is error"}</div>
+          {sent ? (
+            <div>Sent Successfully</div>
+          ) : (
+            <div>{error && "can't send email there is error"}</div>
+          )}
         </span>
       </div>
     </div>
