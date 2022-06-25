@@ -35,9 +35,10 @@ exports.sendVerificationToken = async (req, res, next) => {
 
   await user.save({ validateBeforeSave: false });
 
-  const verifyEmailUrl = `${req.protocol}://${req.get(
-    "host"
-  )}/api/v1/user/verify/${verificationToken}`;
+  // const verifyEmailUrl = `${req.protocol}://${req.get(
+  //   "host"
+  // )}/api/v1/user/verify/${verificationToken}`;
+  const verifyEmailUrl = `${req.protocol}://localhost:3000/user/verify/${verificationToken}`;
 
   const message = `Verify you email : - ${verifyEmailUrl}`;
 
@@ -76,13 +77,14 @@ exports.checkVerificationToken = async (req, res, next) => {
     },
   });
   if (!user) {
-    res
-      .status(404)
-      .json({
-        message: "Token is Invalid or Expire Try Again",
-        success: false,
-      });
+    res.status(404).json({
+      message: "Token is Invalid or Expire Try Again",
+      success: false,
+    });
   }
+  user.verificationToken = "";
+  user.verificationTokenExpire = "";
+  await user.save();
   res
     .status(200)
     .json({ message: "User is Verfied Successfully", success: true });
