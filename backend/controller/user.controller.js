@@ -1,6 +1,6 @@
 const User = require("../models/user.model");
 const sendEmail = require("../utils/sendEmail");
-
+const crypto = require("crypto");
 exports.getAllUsers = async (req, res, next) => {
   const emails = await User.find();
 
@@ -37,7 +37,7 @@ exports.sendVerificationToken = async (req, res, next) => {
 
   const verifyEmailUrl = `${req.protocol}://${req.get(
     "host"
-  )}/user/verify/${verificationToken}`;
+  )}/api/v1/user/verify/${verificationToken}`;
 
   const message = `Verify you email : - ${verifyEmailUrl}`;
 
@@ -61,4 +61,29 @@ exports.sendVerificationToken = async (req, res, next) => {
       e,
     });
   }
+};
+
+exports.checkVerificationToken = async (req, res, next) => {
+  const { token } = req.params;
+  const verificationToken = crypto
+    .createHash("sha256")
+    .update(token)
+    .digest("hex");
+  const user = await User.findOne({
+    verificationToken,
+    verificationTokenExpire: {
+      $gt: Date.now(),
+    },
+  });
+  if (!user) {
+    res
+      .status(404)
+      .json({
+        message: "Token is Invalid or Expire Try Again",
+        success: false,
+      });
+  }
+  res
+    .status(200)
+    .json({ message: "User is Verfied Successfully", success: true });
 };
