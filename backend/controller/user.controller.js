@@ -1,19 +1,22 @@
 const User = require("../models/user.model");
 const sendEmail = require("../utils/sendEmail");
 const crypto = require("crypto");
-exports.getAllUsers = async (req, res, next) => {
+const catchAsyncError = require("../middleware/catchAsync");
+const ErrorHandler = require("../utils/ErrorHandler");
+
+exports.getAllUsers = catchAsyncError(async (req, res, next) => {
   const emails = await User.find();
 
   if (!emails) {
-    res.json({ message: "No emails found" });
+    return next(new ErrorHandler("No User Found", 400));
   }
   res.status(200).json({
     success: true,
     emails,
   });
-};
+});
 
-exports.createUser = async (req, res, next) => {
+exports.createUser = catchAsyncError(async (req, res, next) => {
   const { email } = req.body;
 
   const user = await User.create({
@@ -23,14 +26,14 @@ exports.createUser = async (req, res, next) => {
     success: true,
     user,
   });
-};
+});
 
-exports.sendVerificationToken = async (req, res, next) => {
+exports.sendVerificationToken = catchAsyncError(async (req, res, next) => {
   const { email } = req.body;
   console.log(req.body);
   const user = await User.findOne({ email: email });
   if (!user) {
-    res.json({ error: "no User Found" });
+    return next(new ErrorHandler("No User Found", 400));
   }
   const verificationToken = user.getVerificationToken();
 
@@ -63,9 +66,9 @@ exports.sendVerificationToken = async (req, res, next) => {
       success: false,
     });
   }
-};
+});
 
-exports.checkVerificationToken = async (req, res, next) => {
+exports.checkVerificationToken = catchAsyncError(async (req, res, next) => {
   const { token } = req.params;
   console.log(token);
   const verificationToken = crypto
@@ -83,14 +86,11 @@ exports.checkVerificationToken = async (req, res, next) => {
   console.log(user);
 
   if (!user) {
-    res.status(404).json({
-      message: "Token is Invalid or Expire Try Again",
-      success: false,
-    });
+    return next(new ErrorHandler("No User Found", 400));
   }
   user.isVerified = true;
   await user.save({ validateBeforeSave: false });
   res
     .status(200)
     .json({ message: "User is Verfied Successfully", success: true });
-};
+});
