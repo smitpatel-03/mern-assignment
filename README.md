@@ -1,3 +1,3 @@
 # mern-assignment
 
-[!["Video"]([https://img.youtube.com/vi/YOUTUBE_VIDEO_ID_HERE/0.jpg](https://youtu.be/OPz10FroCTE))]
+[![IMAGE ALT TEXT HERE](https://img.youtube.com/vi/OPz10FroCTE/0.jpg)](https://www.youtube.com/watch?v=OPz10FroCTE)
