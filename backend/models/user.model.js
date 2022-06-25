@@ -4,6 +4,10 @@ const userSchema = new mongoose.Schema({
   email: {
     type: String,
   },
+  isVerified: {
+    type: Boolean,
+    default: false,
+  },
   verificationToken: String,
   verificationTokenExpire: Date,
 });

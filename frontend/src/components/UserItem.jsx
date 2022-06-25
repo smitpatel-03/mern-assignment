@@ -20,10 +20,24 @@ const UserItem = ({ user }) => {
   return (
     <div className="row justify-content-center">
       <div className="col-md-6 d-flex justify-content-between shadow-lg p-3 mb-3 bg-white rounded align-items-center">
-        <span>{user.email}</span>
+        {console.log(user)}
+        <span className="d-flex">
+          {user.email}
+          <span className="ms-3">
+            {user.isVerified ? (
+              <p style={{ color: "green", fontWeight: "600" }}>Verified</p>
+            ) : (
+              <p style={{ color: "red", fontWeight: "600" }}>Not Verified</p>
+            )}
+          </span>
+        </span>
         <span>
-          <button className="btn btn-primary" onClick={sendVerification}>
-            Verify
+          <button
+            className="btn btn-primary"
+            onClick={sendVerification}
+            disabled={user.isVerified}
+          >
+            {user.isVerified ? "Verified" : "Verify"}
           </button>
           {sent ? (
             <div>Sent Successfully</div>

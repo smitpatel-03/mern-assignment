@@ -88,7 +88,8 @@ exports.checkVerificationToken = async (req, res, next) => {
       success: false,
     });
   }
-
+  user.isVerified = true;
+  await user.save({ validateBeforeSave: false });
   res
     .status(200)
     .json({ message: "User is Verfied Successfully", success: true });
