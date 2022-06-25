@@ -27,6 +27,7 @@ exports.createUser = async (req, res, next) => {
 
 exports.sendVerificationToken = async (req, res, next) => {
   const { email } = req.body;
+  console.log(req.body);
   const user = await User.findOne({ email: email });
   if (!user) {
     res.json({ error: "no User Found" });
@@ -38,6 +39,7 @@ exports.sendVerificationToken = async (req, res, next) => {
   // const verifyEmailUrl = `${req.protocol}://${req.get(
   //   "host"
   // )}/api/v1/user/verify/${verificationToken}`;
+  console.log(verificationToken);
   const verifyEmailUrl = `${req.protocol}://localhost:3000/user/verify/${verificationToken}`;
 
   const message = `Verify you email : - ${verifyEmailUrl}`;
@@ -59,32 +61,34 @@ exports.sendVerificationToken = async (req, res, next) => {
     await user.save({ validateBeforeSave: false });
     res.json({
       success: false,
-      e,
     });
   }
 };
 
 exports.checkVerificationToken = async (req, res, next) => {
   const { token } = req.params;
+  console.log(token);
   const verificationToken = crypto
     .createHash("sha256")
     .update(token)
     .digest("hex");
+
   const user = await User.findOne({
     verificationToken,
     verificationTokenExpire: {
       $gt: Date.now(),
     },
   });
+
+  console.log(user);
+
   if (!user) {
     res.status(404).json({
       message: "Token is Invalid or Expire Try Again",
       success: false,
     });
   }
-  user.verificationToken = "";
-  user.verificationTokenExpire = "";
-  await user.save();
+
   res
     .status(200)
     .json({ message: "User is Verfied Successfully", success: true });
